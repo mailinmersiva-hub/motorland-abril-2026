@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe Web · Motorland Canarias · Abril 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f5f5f7;--white:#ffffff;--dark:#1d1d1f;
+  --blue:#5B35D5;--blue-dark:#4826B8;
+  --border:rgba(0,0,0,0.07);--text:#1d1d1f;--muted:#6e6e73;--light:#aeaeb2;
+}
+html,body{min-height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);}
+body{padding:32px 40px;}
+@media(max-width:600px){body{padding:16px;}}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px;}
+.topbar-left{display:flex;align-items:center;gap:16px;}
+.brand{display:flex;align-items:center;gap:7px;padding-right:16px;border-right:1px solid var(--border);}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);}
+.brand-name{font-size:12px;font-weight:300;color:var(--muted);}
+.topbar-title h1{font-size:20px;font-weight:200;color:var(--text);letter-spacing:-0.04em;line-height:1;}
+.topbar-title p{font-size:11px;font-weight:300;color:var(--muted);margin-top:3px;}
+.btn-primary{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:400;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .15s;}
+.btn-primary:hover{background:var(--blue-dark);}
+
+.info-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.info-pill{font-size:11px;font-weight:300;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--muted);}
+.info-pill span{color:var(--text);font-weight:400;}
+
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:700px){.stat-row{grid-template-columns:1fr 1fr;}}
+.stat-card{background:var(--white);border-radius:12px;padding:18px;border:1px solid var(--border);}
+.stat-card.accent{background:var(--dark);border-color:transparent;}
+.stat-label{font-size:10px;font-weight:400;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.stat-card.accent .stat-label{color:rgba(255,255,255,0.35);}
+.stat-val{font-size:32px;font-weight:200;letter-spacing:-0.04em;color:var(--text);line-height:1;}
+.stat-card.accent .stat-val{color:#fff;}
+.stat-delta{font-size:11px;font-weight:400;margin-top:6px;}
+.up{color:#30d158;}
+.stat-card.accent .stat-delta{color:rgba(255,255,255,0.35);}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:800px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+.card{background:var(--white);border-radius:12px;padding:20px;border:1px solid var(--border);}
+.card-dark{background:var(--dark);border-radius:12px;padding:20px;border:none;}
+.card-title{font-size:10px;font-weight:400;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.card-dark .card-title{color:rgba(255,255,255,0.3);}
+
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.bar-lbl{font-size:12px;font-weight:300;color:var(--muted);min-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-track{flex:1;height:4px;background:var(--bg);border-radius:2px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:2px;}
+.bar-num{font-size:12px;font-weight:400;color:var(--text);min-width:30px;text-align:right;}
+.card-note{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;font-weight:300;color:var(--muted);}
+
+.donut-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0 8px;}
+.donut-val{font-size:36px;font-weight:200;letter-spacing:-0.04em;color:var(--text);margin-top:8px;line-height:1;}
+.donut-sub{font-size:11px;font-weight:300;color:var(--muted);margin-top:3px;}
+.donut-delta{font-size:11px;font-weight:400;color:#30d158;margin-top:5px;}
+
+.trabajo{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.trabajo:last-child{border-bottom:none;}
+.t-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.t-i1{background:rgba(91,53,213,0.08);}
+.t-i2{background:rgba(48,209,88,0.1);}
+.t-i3{background:rgba(255,159,10,0.1);}
+.t-i4{background:rgba(255,69,58,0.1);}
+.t-i5{background:rgba(0,0,0,0.04);}
+.t-title{font-size:12px;font-weight:400;color:var(--text);margin-bottom:3px;}
+.t-desc{font-size:11px;font-weight:300;color:var(--muted);line-height:1.5;}
+
+.plugin-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.plugin-row:last-child{border-bottom:none;}
+.plugin-name{font-size:12px;font-weight:300;color:var(--text);}
+.plugin-vers{display:flex;align-items:center;gap:6px;font-size:11px;}
+.v-old{color:var(--light);font-weight:300;}
+.v-arr{color:var(--light);}
+.v-new{color:var(--blue);font-weight:500;}
+.v-date{font-size:10px;color:var(--light);font-weight:300;min-width:70px;text-align:right;}
+
+.ev-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.ev-row:last-child{border-bottom:none;}
+.ev-name{font-size:12px;font-weight:300;color:rgba(255,255,255,0.55);}
+.ev-bar-wrap{display:flex;align-items:center;gap:8px;}
+.ev-track{width:60px;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
+.ev-fill{height:100%;border-radius:2px;background:#5B35D5;}
+.ev-num{font-size:12px;font-weight:300;color:#fff;min-width:32px;text-align:right;}
+
+.footer-card{background:var(--dark);border-radius:12px;padding:22px 26px;display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:20px;flex-wrap:wrap;}
+.fc-badge{display:inline-block;background:var(--blue);color:#fff;font-size:10px;font-weight:400;border-radius:5px;padding:3px 9px;margin-bottom:8px;letter-spacing:0.05em;}
+.fc-left p{font-size:12px;font-weight:300;color:rgba(255,255,255,0.45);line-height:1.65;max-width:440px;}
+.fc-right{text-align:right;flex-shrink:0;}
+.fc-logo{display:flex;align-items:center;gap:7px;justify-content:flex-end;margin-bottom:6px;}
+.fc-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);}
+.fc-name{font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);}
+.fc-date{font-size:11px;font-weight:300;color:rgba(255,255,255,0.25);margin-top:3px;}
+
+.chart-wrap{position:relative;width:100%;height:130px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <span class="brand-name">Inmersiva Automoción</span>
+    </div>
+    <div class="topbar-title">
+      <h1>Informe web · Motorland Canarias</h1>
+      <p>motorlandcanarias.com &nbsp;·&nbsp; 1 abr – 1 may 2026</p>
+    </div>
+  </div>
+  <a class="btn-primary" href="https://analytics.google.com/analytics/web/#/a317532882p524782161/reports/reportinghub" target="_blank">Ver en GA4 ↗</a>
+</div>
+
+<div class="info-row">
+  <div class="info-pill">WordPress <span>6.9.4</span></div>
+  <div class="info-pill">IP <span>75.102.57.42</span></div>
+  <div class="info-pill">Plugins actualizados <span>13</span></div>
+  <div class="info-pill">Backups <span>Diarios automáticos</span></div>
+  <div class="info-pill">Revisiones técnicas <span>2–3 / semana</span></div>
+  <div class="info-pill">Artículos SEO <span>5 publicados</span></div>
+</div>
+
+<div class="stat-row">
+  <div class="stat-card accent">
+    <div class="stat-label">Engagement rate</div>
+    <div class="stat-val">73%</div>
+    <div class="stat-delta">▲ +23.76% vs mes anterior</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Usuarios activos</div>
+    <div class="stat-val">86</div>
+    <div class="stat-delta up">▲ +11.97%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Nuevos usuarios</div>
+    <div class="stat-val">80</div>
+    <div class="stat-delta up">▲ +8.79%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Visualizaciones</div>
+    <div class="stat-val">506</div>
+    <div class="stat-delta up">▲ +30.07%</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">Fuentes de tráfico · sesiones</div>
+    <div class="bar-row"><span class="bar-lbl">Organic Search</span><div class="bar-track"><div class="bar-fill" style="width:61%;background:#5B35D5;"></div></div><span class="bar-num">81</span></div>
+    <div class="bar-row"><span class="bar-lbl">Direct</span><div class="bar-track"><div class="bar-fill" style="width:32%;background:#8B6FE8;"></div></div><span class="bar-num">42</span></div>
+    <div class="bar-row"><span class="bar-lbl">Organic Social</span><div class="bar-track"><div class="bar-fill" style="width:7%;background:#B8A4F0;"></div></div><span class="bar-num">9</span></div>
+    <div class="bar-row"><span class="bar-lbl">Sin asignar</span><div class="bar-track"><div class="bar-fill" style="width:1%;background:#e8e8ed;"></div></div><span class="bar-num">1</span></div>
+    <div class="card-note">El <strong style="color:#5B35D5;font-weight:500;">61%</strong> del tráfico proviene de búsqueda orgánica — la estrategia SEO está funcionando.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Páginas más visitadas</div>
+    <div class="bar-row"><span class="bar-lbl">Classified Ads</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#5B35D5;"></div></div><span class="bar-num">146</span></div>
+    <div class="bar-row"><span class="bar-lbl">/ (Inicio)</span><div class="bar-track"><div class="bar-fill" style="width:94%;background:#8B6FE8;"></div></div><span class="bar-num">137</span></div>
+    <div class="bar-row"><span class="bar-lbl">/listings/</span><div class="bar-track"><div class="bar-fill" style="width:31%;background:#B8A4F0;"></div></div><span class="bar-num">45</span></div>
+    <div class="bar-row"><span class="bar-lbl">/stock/mercedes</span><div class="bar-track"><div class="bar-fill" style="width:10%;background:#D4C8F8;"></div></div><span class="bar-num">14</span></div>
+    <div class="bar-row"><span class="bar-lbl">/financiacion/</span><div class="bar-track"><div class="bar-fill" style="width:4%;background:#e8e8ed;"></div></div><span class="bar-num">5</span></div>
+  </div>
+</div>
+
+<div class="grid-3">
+  <div class="card">
+    <div class="card-title">Países de origen</div>
+    <div class="bar-row"><span class="bar-lbl">🇪🇸 España</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#5B35D5;"></div></div><span class="bar-num">66</span></div>
+    <div class="bar-row"><span class="bar-lbl">🇸🇬 Singapur</span><div class="bar-track"><div class="bar-fill" style="width:11%;background:#8B6FE8;"></div></div><span class="bar-num">7</span></div>
+    <div class="bar-row"><span class="bar-lbl">🇩🇪 Alemania</span><div class="bar-track"><div class="bar-fill" style="width:6%;background:#B8A4F0;"></div></div><span class="bar-num">4</span></div>
+    <div class="bar-row"><span class="bar-lbl">🇺🇸 EE.UU.</span><div class="bar-track"><div class="bar-fill" style="width:5%;background:#D4C8F8;"></div></div><span class="bar-num">3</span></div>
+    <div class="bar-row"><span class="bar-lbl">🇨🇳 China</span><div class="bar-track"><div class="bar-fill" style="width:3%;background:#e8e8ed;"></div></div><span class="bar-num">2</span></div>
+    <div class="card-note">Audiencia <strong style="color:#1d1d1f;font-weight:400;">90% nacional</strong> — bien segmentada.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Navegadores · interacción</div>
+    <div class="bar-row"><span class="bar-lbl">Chrome</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#5B35D5;"></div></div><span class="bar-num">74</span></div>
+    <div class="bar-row"><span class="bar-lbl">Safari</span><div class="bar-track"><div class="bar-fill" style="width:24%;background:#8B6FE8;"></div></div><span class="bar-num">18</span></div>
+    <div class="bar-row"><span class="bar-lbl">Android WV</span><div class="bar-track"><div class="bar-fill" style="width:4%;background:#B8A4F0;"></div></div><span class="bar-num">3</span></div>
+    <div class="bar-row"><span class="bar-lbl">Firefox</span><div class="bar-track"><div class="bar-fill" style="width:4%;background:#D4C8F8;"></div></div><span class="bar-num">3</span></div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.07);display:flex;align-items:baseline;gap:6px;">
+      <span style="font-size:28px;font-weight:200;letter-spacing:-0.04em;color:#5B35D5;">2:07</span>
+      <span style="font-size:11px;font-weight:300;color:#6e6e73;">tiempo medio de interacción</span>
+    </div>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div class="card-title" style="text-align:center;">Engagement rate</div>
+    <div class="donut-wrap">
+      <div style="position:relative;width:100px;height:100px;">
+        <canvas id="donut" role="img" aria-label="Engagement rate del 73%">73%</canvas>
+      </div>
+      <div class="donut-val">73%</div>
+      <div class="donut-sub">Media sector ≈ 45%</div>
+      <div class="donut-delta">▲ +23.76% vs anterior</div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">Retención por cohorte · últimas 6 semanas</div>
+    <div class="chart-wrap">
+      <canvas id="lineChart" role="img" aria-label="Retención de usuarios semana a semana">Retención.</canvas>
+    </div>
+    <div style="margin-top:8px;font-size:11px;font-weight:300;color:#6e6e73;">
+      Usuarios activos: <strong style="color:#1d1d1f;font-weight:400;">93</strong> (30d) &nbsp;·&nbsp; <strong style="color:#1d1d1f;font-weight:400;">23</strong> (7d) &nbsp;·&nbsp; <strong style="color:#1d1d1f;font-weight:400;">2</strong> (hoy)
+    </div>
+  </div>
+  <div class="card-dark">
+    <div class="card-title">Eventos GA4 · este período</div>
+    <div class="ev-row"><span class="ev-name">page_view</span><div class="ev-bar-wrap"><div class="ev-track"><div class="ev-fill" style="width:100%;"></div></div><span class="ev-num">506</span></div></div>
+    <div class="ev-row"><span class="ev-name">user_engagement</span><div class="ev-bar-wrap"><div class="ev-track"><div class="ev-fill" style="width:58%;"></div></div><span class="ev-num">294</span></div></div>
+    <div class="ev-row"><span class="ev-name">session_start</span><div class="ev-bar-wrap"><div class="ev-track"><div class="ev-fill" style="width:26%;"></div></div><span class="ev-num">132</span></div></div>
+    <div class="ev-row"><span class="ev-name">first_visit</span><div class="ev-bar-wrap"><div class="ev-track"><div class="ev-fill" style="width:16%;"></div></div><span class="ev-num">80</span></div></div>
+    <div class="ev-row"><span class="ev-name">scroll</span><div class="ev-bar-wrap"><div class="ev-track"><div class="ev-fill" style="width:10%;"></div></div><span class="ev-num">50</span></div></div>
+    <div class="ev-row"><span class="ev-name">click + form_start</span><div class="ev-bar-wrap"><div class="ev-track"><div class="ev-fill" style="width:1%;"></div></div><span class="ev-num">4</span></div></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:10px;">
+  <div class="card-title">Trabajos realizados este mes</div>
+  <div class="trabajo"><div class="t-icon t-i2">🛡</div><div><div class="t-title">Seguridad y copias de seguridad</div><div class="t-desc">Backups diarios automáticos. Recuperación inmediata garantizada ante cualquier incidencia.</div></div></div>
+  <div class="trabajo"><div class="t-icon t-i1">⚙</div><div><div class="t-title">Mantenimiento técnico · 13 plugins actualizados</div><div class="t-desc">Revisiones 2–3 veces por semana. Lote principal el 27/04 + ManageWP Worker el 13/04.</div></div></div>
+  <div class="trabajo"><div class="t-icon t-i3">✍</div><div><div class="t-title">Estrategia de contenidos SEO</div><div class="t-desc">5 nuevos artículos publicados en blog, enfocados en palabras clave con intención comercial.</div></div></div>
+  <div class="trabajo"><div class="t-icon t-i4">🚗</div><div><div class="t-title">Sincronización manual de stock</div><div class="t-desc">Monitorización de coches.net y subida vehículo a vehículo para mantener el inventario web al día.</div></div></div>
+  <div class="trabajo"><div class="t-icon t-i5">📈</div><div><div class="t-title">Optimización y monitorización continua</div><div class="t-desc">Ajustes de rendimiento activos durante todo el período — velocidad y estabilidad garantizadas.</div></div></div>
+</div>
+
+<div class="card" style="margin-top:10px;">
+  <div class="card-title">Historial de actualizaciones · Abril 2026</div>
+  <div class="plugin-row"><span class="plugin-name">Elementor Pro</span><div class="plugin-vers"><span class="v-old">3.35.0</span><span class="v-arr">→</span><span class="v-new">4.0.3</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">Elementor</span><div class="plugin-vers"><span class="v-old">4.0.0</span><span class="v-arr">→</span><span class="v-new">4.0.3</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">Yoast SEO</span><div class="plugin-vers"><span class="v-old">27.2</span><span class="v-arr">→</span><span class="v-new">27.4</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">W3 Total Cache</span><div class="plugin-vers"><span class="v-old">2.9.2</span><span class="v-arr">→</span><span class="v-new">2.9.4</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">Site Kit by Google</span><div class="plugin-vers"><span class="v-old">1.175.0</span><span class="v-arr">→</span><span class="v-new">1.177.0</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">Loginizer Pro</span><div class="plugin-vers"><span class="v-old">2.0.6</span><span class="v-arr">→</span><span class="v-new">2.0.7</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">JetBackup</span><div class="plugin-vers"><span class="v-old">3.1.19.8</span><span class="v-arr">→</span><span class="v-new">3.1.20.3</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">All-in-One WP Migration</span><div class="plugin-vers"><span class="v-old">7.103</span><span class="v-arr">→</span><span class="v-new">7.105</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">Akismet Anti-Spam</span><div class="plugin-vers"><span class="v-old">5.6</span><span class="v-arr">→</span><span class="v-new">5.7</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">CookieYes GDPR</span><div class="plugin-vers"><span class="v-old">3.4.0</span><span class="v-arr">→</span><span class="v-new">3.4.2</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">MC4WP: Mailchimp for WP</span><div class="plugin-vers"><span class="v-old">4.12.1</span><span class="v-arr">→</span><span class="v-new">4.12.2</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">Duplicate Page</span><div class="plugin-vers"><span class="v-old">4.5.7</span><span class="v-arr">→</span><span class="v-new">4.5.8</span><span class="v-date">27/04/2026</span></div></div>
+  <div class="plugin-row"><span class="plugin-name">ManageWP Worker</span><div class="plugin-vers"><span class="v-old">4.9.32</span><span class="v-arr">→</span><span class="v-new">4.9.33</span><span class="v-date">13/04/2026</span></div></div>
+</div>
+
+<div class="footer-card">
+  <div class="fc-left">
+    <div class="fc-badge">Todas las métricas al alza</div>
+    <p>La base SEO orgánica sigue creciendo. El engagement del 73% supera ampliamente la media del sector (~45%). El sitio está protegido, actualizado y operativo — el siguiente paso es seguir escalando el tráfico.</p>
+  </div>
+  <div class="fc-right">
+    <div class="fc-logo">
+      <div class="fc-dot"></div>
+      <span style="font-size:12px;font-weight:300;color:rgba(255,255,255,0.4);">Inmersiva Automoción</span>
+    </div>
+    <div class="fc-name">Motorland Canarias</div>
+    <div class="fc-date">Informe · Abril 2026</div>
+  </div>
+</div>
+
+<script>
+new Chart(document.getElementById('donut'),{
+  type:'doughnut',
+  data:{datasets:[{data:[73,27],backgroundColor:['#5B35D5','rgba(0,0,0,0.05)'],borderWidth:0,hoverOffset:0}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'82%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:900}}
+});
+new Chart(document.getElementById('lineChart'),{
+  type:'line',
+  data:{
+    labels:['22 mar','29 mar','5 abr','12 abr','19 abr','26 abr'],
+    datasets:[{label:'Retención %',data:[100,7.8,6.1,8.8,2.7,0],borderColor:'#5B35D5',backgroundColor:'rgba(91,53,213,0.06)',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#5B35D5',pointBorderColor:'#fff',pointBorderWidth:2,fill:true,tension:0.4}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.parsed.y.toFixed(1)+'%';}}}},
+    scales:{
+      x:{ticks:{font:{size:10,family:'Inter',weight:'300'},color:'#aeaeb2',autoSkip:false,maxRotation:0},grid:{color:'rgba(0,0,0,0.04)'}},
+      y:{ticks:{font:{size:10,family:'Inter',weight:'300'},color:'#aeaeb2',callback:function(v){return v+'%';}},grid:{color:'rgba(0,0,0,0.04)'},min:0,max:110}
+    }
+  }
+});
+</script>
+</body>
+</html>
